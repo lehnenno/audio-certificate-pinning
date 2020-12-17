@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Audio Certificate Pinning",
+  "description": "description",
+  "version": "0.1",
+  "permissions": [
+  ],
+  "icons": {
+    "64": "icons/icon.png"
+  },
+  "background": {
+    "scripts": ["background_script.js"]
+  },
+  "browser_action": {
+    "default_icon": {
+      "64": "icons/icon.png"
+    },
+    "default_popup": "browserAction/index.html",
+    "default_title": "Audio Certificate Pinning"
+  }
+}

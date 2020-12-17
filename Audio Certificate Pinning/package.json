@@ -1,0 +1,25 @@
+{
+  "name": "audiocertificatepinning",
+  "version": "1.0.0",
+  "description": "",
+  "main": "background_script_o.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "npm run clean && mkdir build",
+    "build": "npm run copy_manifest && npm run prepare_background && npm run copy_icons && npm run copy_browserAction",
+    "copy_manifest": "cp ./src/manifest.json ./build/manifest.json",
+    "prepare_background": "browserify ./src/background_script.js -o ./build/background_script.js && cp ./src/background.html ./build/background.html",
+    "copy_icons": "cp -r ./src/icons ./build/icons",
+    "copy_browserAction": "browserify ./src/browserAction/script.js -o ./build/browserAction/script.js && cp ./src/browserAction/index.html ./build/browserAction/index.html && cp ./src/browserAction/style.css ./build/browserAction/style.css",
+    "clean": "rm -r ./build"
+  },
+  "author": "Noah Lehnen",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^17.0.0"
+  },
+  "dependencies": {
+    "scribbletune": "^3.15.0",
+    "tone": "^14.7.58"
+  }
+}
