@@ -1,11 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link href="style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h1 id="myHeading">My content</h1>
-    <script src="script.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <h1>Audio Certificate Pinning</h1>
+  <script src="script.js"></script>
+  <div class="container">
+    <h2>Volume: </h2>
+    <input type="range" min="0" max="100" value="50" class="slider" id="volume">
+  </div>
+  <div id="tobepinned" class="container">
+    <form>
+      <h2>What would you like to pin?</h2>
+      <input type="radio" id="key" name="Pinned" value="PublicKey">
+      <label for="key"> Public Key</label>
+      <input type="radio" id="cert" name="Pinned" value="Certificate">
+      <label for="cert"> Certificate</label>
+      <input type="radio" id="custom" name="Pinned" value="Custom">
+      <label for="custom"> Custom Value</label>
+    </form>
+    <textarea class="textarea"></textarea>
+  </div>
+  <button class="inline">Stop</button>
+  <button class="inline">Play</button>
+  <div class="container">
+    <textarea readonly class="textarea noborder"></textarea>
+  </div>
+</body>
+
 </html>

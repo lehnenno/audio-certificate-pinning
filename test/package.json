@@ -1,0 +1,20 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify -r scribbletune -r tone -r lodash -o bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.20",
+    "scribbletune": "^3.15.0",
+    "tone": "^14.7.58"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0"
+  }
+}

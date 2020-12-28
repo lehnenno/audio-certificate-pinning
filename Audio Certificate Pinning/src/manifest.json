@@ -1,9 +1,11 @@
 {
   "manifest_version": 2,
   "name": "Audio Certificate Pinning",
-  "description": "description",
+  "description": "Certificates are music!",
   "version": "0.1",
+  "content_security_policy": "script-src 'self' blob:; object-src 'self'",
   "permissions": [
+    "storage","webRequest","webRequestBlocking","<all_urls>"
   ],
   "icons": {
     "64": "icons/icon.png"

@@ -1,3 +1,68 @@
-h1 {
-  font-style: italic;
+button {
+  display: inline-block;
+  padding: 15px 25px;
+  margin: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: blue;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+button:hover {background-color: #2571b8}
+
+button:active {
+  background-color: #086397;
+  box-shadow: 0 5px #888;
+  transform: translateY(4px);
+}
+
+.inline {
+  display:inline-block
+}
+
+.slider {
+  width: 100%;
+  height: 25px;
+  background: #d3d3d3;
+  border-radius: 5px;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: blue;
+  cursor: pointer;
+}
+
+.container {
+  width: min-content;
+  min-width: 350px;
+  max-width: 500px;
+  border-style: solid;
+  border-color: black;
+  padding: 10px;
+  margin: 10px;
+}
+
+.textarea {
+  resize: none;
+  width: 100%;
+  height: 100px;
+}
+
+.noborder {
+  border: none;
 }
