@@ -9,25 +9,22 @@ onload = function () {
   play2()
 }
 
-function play2() {
+function play2 () {
   const MYHASH = '45c9a6614fccd4f9592d8283a4f25bff84076fd43ee9f90eaa07746ebbed02ca'
-  const scale = getScale(3, blues2).concat(getScale(4, blues2))
+  const scale = getScale(4, blues2)
   console.log(scale)
 
   //FIXME parseint klaut führende Nullen
   const onetoeight = parseInt(MYHASH, 16).toString(scale.length)
   console.log(onetoeight)
 
-  const patternCollection = ["[x_x]", "[xxx]", "x-", "[--x]"]
+  const patternCollection = ["[x_x]", "[x_x]", "[xxx]", "[xxx]", "x", "-", "[--x]"]
 
-  let pattern = ""
-  for (let i = 0; i < 10; i++) {
-
+  let pattern = "[xxx]"
+  for (let i = 0; i < 30; i++) {
     pattern += _.sample(patternCollection)
     console.log(pattern)
   }
-
-
 
   let melody = []
   for (const x of onetoeight) {
@@ -40,9 +37,17 @@ function play2() {
     pattern
   })
 
+  const clips = tsd()
+  console.log(clips)
+  clips[0].loop = false
+  clips[0].start()
+  clips[1].loop = false
+  clips[1].start()
+
   // the clip keeps looping if this property isnt set
   clip.loop = false
   // starts the clip
+  console.log(clip)
   clip.start()
   console.log(clip)
 
@@ -52,7 +57,7 @@ function play2() {
   Tone.context.resume().then(() => Tone.Transport.start())
 }
 
-function play() {
+function play () {
   // ---- test values ----
   const MYHASH = '45c9a6614fccd4f9592d8283a4f25bff84076fd43ee9f90eaa07746ebbed02ca'
   const MYHASH2 = 'a11a198cc31b4b7c2f37013847b9c3ab35c8d24d4db2159b29d41a9296fc1a82'
@@ -133,7 +138,7 @@ function play() {
 }
 
 // function to get a rhythm for a given value
-function getRhythm(x) {
+function getRhythm (x) {
   return 'x'
   // x = parseInt(x, 16)
   // x = Math.floor(x / 4)
@@ -161,9 +166,12 @@ const locrian = [0, 1, 3, 5, 6, 8, 10]
 const all = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const blues1 = [0, 3, 5, 7, 10]
 const blues2 = [0, 3, 5, 6, 7, 10]
+const tonic = [0, 5, 7]
+const subdominant = [5, 0, 2]
+const dominant = [7, 2, 4]
 
 // function to get the scales in the specified pitch
-function getScale(pitch, indices) {
+function getScale (pitch, indices) {
   const scale = []
   let index = 0
   for (const note of chromatic) {
@@ -173,4 +181,59 @@ function getScale(pitch, indices) {
     index++
   }
   return scale
+}
+
+function tsd () {
+  let scaleTonic = getScale(3, tonic)
+  let scaleSubdominant = getScale(3, subdominant)
+  let scaleDominant = getScale(3, dominant)
+  const pattern = "xxx-".repeat(12)
+  let notes1 = []
+  let notes2 = []
+
+  let result = tsdHelp(scaleTonic, 2)
+  notes1 = notes1.concat(result[0])
+  notes2 = notes2.concat(result[1])
+  result = tsdHelp(scaleSubdominant, 2)
+  notes1 = notes1.concat(result[0])
+  notes2 = notes2.concat(result[1])
+  result = tsdHelp(scaleTonic, 2)
+  notes1 = notes1.concat(result[0])
+  notes2 = notes2.concat(result[1])
+  result = tsdHelp(scaleDominant, 1)
+  notes1 = notes1.concat(result[0])
+  notes2 = notes2.concat(result[1])
+  result = tsdHelp(scaleSubdominant, 1)
+  notes1 = notes1.concat(result[0])
+  notes2 = notes2.concat(result[1])
+  result = tsdHelp(scaleTonic, 2)
+  notes1 = notes1.concat(result[0])
+  notes2 = notes2.concat(result[1])
+
+  const clip1 = scribble.clip({
+    synth: 'PolySynth',
+    notes: notes1,
+    pattern
+  })
+
+  const clip2 = scribble.clip({
+    synth: 'PolySynth',
+    notes: notes2,
+    pattern
+  })
+  return [clip1, clip2]
+}
+
+function tsdHelp (scaleAny, amount) {
+  const notes1 = []
+  const notes2 = []
+  for (let i = 0; i < amount; i++) {
+    notes1.push(scaleAny[0])
+    notes2.push(scaleAny[1])
+    notes1.push(scaleAny[0])
+    notes2.push(scaleAny[2])
+    notes1.push(scaleAny[0])
+    notes2.push(scaleAny[1])
+  }
+  return [notes1, notes2]
 }
