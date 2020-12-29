@@ -5,44 +5,51 @@ window.Tone = require('tone')
 const scribble = require('scribbletune')
 const _ = require('lodash')
 
-onload = function () {
-  play2()
+let playingClips = []
+
+function playHash (text) {
+  console.log(text)
+  play2(text)
 }
 
-function play2 () {
-  const MYHASH = '45c9a6614fccd4f9592d8283a4f25bff84076fd43ee9f90eaa07746ebbed02ca'
+function play3(MYHASH) {
   const scale = getScale(4, blues2)
   console.log(scale)
 
   //FIXME parseint klaut führende Nullen
-  const onetoeight = parseInt(MYHASH, 16).toString(scale.length)
-  console.log(onetoeight)
+  const scaledHash = parseInt(MYHASH, 16).toString(scale.length)
+  console.log(scaledHash)
 
   const patternCollection = ["[x_x]", "[x_x]", "[xxx]", "[xxx]", "x", "-", "[--x]"]
 
   let pattern = "[xxx]"
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 12 * 2 - 1; i++) {
     pattern += _.sample(patternCollection)
     console.log(pattern)
   }
 
   let melody = []
-  for (const x of onetoeight) {
+  for (const x of scaledHash) {
     melody.push(scale[parseInt(x, scale.length)])
   }
 
+  let mySynth = new Tone.Synth()
+  mySynth.oscillator.type = 'sine'
+
   const clip = scribble.clip({
-    synth: 'PolySynth',
+    synth: mySynth,
     notes: melody,
     pattern
   })
 
+  playingClips.push(clip)
+
   const clips = tsd()
   console.log(clips)
   clips[0].loop = false
-  clips[0].start()
+  // clips[0].start()
   clips[1].loop = false
-  clips[1].start()
+  // clips[1].start()
 
   // the clip keeps looping if this property isnt set
   clip.loop = false
@@ -50,6 +57,78 @@ function play2 () {
   console.log(clip)
   clip.start()
   console.log(clip)
+
+  // sets the bpm clips should be played at
+  Tone.Transport.bpm.value = 100
+  // this line is required for the playback to work in browser
+  Tone.context.resume().then(() => Tone.Transport.start())
+}
+
+function play2 (MYHASH) {
+  const MYHASHbin = hex2bin(MYHASH)
+  const scale = getScale(4, fournote)
+  console.log(scale)
+
+  let melodySine = []
+  let rhythmSine = ""
+  let melodySaw = []
+  let rhythmSaw = ""
+
+  for (let i = 0; i < MYHASHbin.length / 4; i += 4) {
+    if (MYHASHbin[i] === "0") {
+      const index = parseInt(MYHASHbin[i + 1] + MYHASHbin[i + 2], 2)
+      if (MYHASHbin[i + 3] === "0") {
+        melodySine.push(scale[index])
+        rhythmSine += "x"
+        rhythmSaw += "-"
+      } else {
+        melodySine.push(scale[index])
+        melodySine.push(scale[index])
+        rhythmSine += "[xx]"
+        rhythmSaw += "-"
+      }
+    } else {
+      const index = parseInt(MYHASHbin[i + 1] + MYHASHbin[i + 2], 2)
+      if (MYHASHbin[i + 3] === "0") {
+        melodySaw.push(scale[index])
+        rhythmSine += "-"
+        rhythmSaw += "x"
+      } else {
+        melodySaw.push(scale[index])
+        melodySaw.push(scale[index])
+        rhythmSine += "-"
+        rhythmSaw += "[xx]"
+      }
+    }
+  }
+
+  const sine = new Tone.Synth()
+  sine.oscillator.type = 'sine'
+
+  const clipSine = scribble.clip({
+    synth: sine,
+    notes: melodySine,
+    pattern: rhythmSine
+  })
+
+  const saw = new Tone.Synth()
+  saw.oscillator.type = 'sawtooth'
+  saw.volume.value = -10
+
+  const clipSaw = scribble.clip({
+    synth: saw,
+    notes: melodySaw,
+    pattern: rhythmSaw
+  })
+
+  // the clip keeps looping if this property isnt set
+  clipSine.loop = false
+  clipSaw.loop = false
+  // starts the clip
+  clipSine.start()
+  clipSaw.start()
+
+  playingClips.push(clipSaw, clipSine)
 
   // sets the bpm clips should be played at
   Tone.Transport.bpm.value = 100
@@ -169,6 +248,7 @@ const blues2 = [0, 3, 5, 6, 7, 10]
 const tonic = [0, 5, 7]
 const subdominant = [5, 0, 2]
 const dominant = [7, 2, 4]
+const fournote = [0, 3, 5, 7]
 
 // function to get the scales in the specified pitch
 function getScale (pitch, indices) {
@@ -236,4 +316,39 @@ function tsdHelp (scaleAny, amount) {
     notes2.push(scaleAny[1])
   }
   return [notes1, notes2]
+}
+
+function hex2bin (hex) {
+  hex = hex.replace("0x", "").toLowerCase();
+  var out = "";
+  for (var c of hex) {
+    switch (c) {
+      case '0': out += "0000"; break;
+      case '1': out += "0001"; break;
+      case '2': out += "0010"; break;
+      case '3': out += "0011"; break;
+      case '4': out += "0100"; break;
+      case '5': out += "0101"; break;
+      case '6': out += "0110"; break;
+      case '7': out += "0111"; break;
+      case '8': out += "1000"; break;
+      case '9': out += "1001"; break;
+      case 'a': out += "1010"; break;
+      case 'b': out += "1011"; break;
+      case 'c': out += "1100"; break;
+      case 'd': out += "1101"; break;
+      case 'e': out += "1110"; break;
+      case 'f': out += "1111"; break;
+      default: return "";
+    }
+  }
+
+  return out;
+}
+
+function stop () {
+  for (const x of playingClips) {
+    x.stop()
+  }
+  Tone.context.resume().then(() => Tone.Transport.stop())
 }
