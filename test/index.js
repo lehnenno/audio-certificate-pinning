@@ -69,6 +69,10 @@ function play2 (MYHASH) {
   const scale = getScale(4, fournote)
   console.log(scale)
 
+  const specialPatterns = ["[x_x]","[xx]","[xxx]","[xxxx]","[x-x-]","[-x]","x","[xxxxx]"]
+  const pickedSpecial = _.sample(specialPatterns)
+  console.log(pickedSpecial)
+
   let melodySine = []
   let rhythmSine = ""
   let melodySaw = []
@@ -84,7 +88,7 @@ function play2 (MYHASH) {
       } else {
         melodySine.push(scale[index])
         melodySine.push(scale[index])
-        rhythmSine += "[xx]"
+        rhythmSine += pickedSpecial
         rhythmSaw += "-"
       }
     } else {
@@ -97,7 +101,7 @@ function play2 (MYHASH) {
         melodySaw.push(scale[index])
         melodySaw.push(scale[index])
         rhythmSine += "-"
-        rhythmSaw += "[xx]"
+        rhythmSaw += pickedSpecial
       }
     }
   }
