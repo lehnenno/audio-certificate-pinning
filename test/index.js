@@ -2,23 +2,91 @@
 // tone is for audio playback in the browser
 // scribbletune creates midi data
 window.Tone = require('tone')
-const Tone = window.Tone
+//const Tone = window.Tone
 const scribble = require('scribbletune')
 const _ = require('lodash')
 
 const playingClips = []
 
-function playHash (text) {
+function playHash(text) {
+  stop()
   console.log(text)
-  play4(text)
+  play5(text)
 }
 
-function play4 (MYHASH) {
+function play5(MYHASH) {
+  MYHASH = MYHASH.slice(0,16)
+  const scale = getScale(4, pentatonic).concat(getScale(5, pentatonic)).slice(0, 8)
+  console.log(scale)
+  const basenote = 'F4'
+
+  let melody = [basenote]
+  let rhythm = 'x'
+  let beat = '[x-]'
+
+
+  for (const hexValue of MYHASH) {
+    melody.push(pickNote(hexValue, scale))
+    rhythm += 'x'
+    beat += pickBeat(hexValue)
+  }
+  console.log(beat)
+  console.log(melody)
+
+  const sine = new Tone.Synth()
+  sine.oscillator.type = 'sine'
+
+  const melodyclip = scribble.clip({
+    synth: sine,
+    notes: melody,
+    pattern: rhythm
+  })
+
+  const sawtooth = new Tone.Synth()
+  sawtooth.oscillator.type = 'sawtooth'
+  sawtooth.volume.value = -20
+
+  const beatclip = scribble.clip({
+    pattern: beat,
+    notes: ['F2'],
+    synth: sawtooth
+  })
+
+
+
+  melodyclip.loop = false
+  beatclip.loop = false
+  melodyclip.start()
+  beatclip.start()
+  playingClips.push(melodyclip, beatclip)
+
+  Tone.Transport.bpm.value = 120
+  // this line is required for the playback to work in browser
+  Tone.context.resume().then(() => Tone.Transport.start())
+}
+
+function pickNote(hexValue, scale) {
+  if(scale.length!==8){
+    throw Error('scale must have a length of 8')
+  }
+  return scale[Math.floor(parseInt(hexValue,16) / 2)]
+}
+
+function pickBeat(hexValue) {
+  if(parseInt(hexValue,16)%2===0){
+    return '[x-]'
+  } else {
+    return '[-x]'
+  }
+}
+
+function play4(MYHASH) {
   const MYHASHbin = hex2bin(MYHASH).slice(0, 64)
   const meta = MYHASHbin.slice(0, 10)
-  const scalesTypes = [major, dorian, phrygian, lydian, mixlydian, minor, locrian, pentatonic]
+  const scalesTypes = [major, ganzton, phrygian, zigeunermoll, blues2, minor, septakkord, pentatonic]
   const scaleType = scalesTypes[parseInt(meta.slice(0, 3), 2)]
-  const scale = getScale(2, scaleType).concat(getScale(3, scaleType)).concat(getScale(4, scaleType))
+  const scale = getScale(3, scaleType).concat(getScale(4, scaleType))//.concat(getScale(5, scaleType))
+  const basetone = 'C4'
 
   // TODO hier fehlen 8 schlagzeugpattern (3bit von meta)
 
@@ -26,12 +94,12 @@ function play4 (MYHASH) {
 
   if (meta[8] === '0') {
     // sets the bpm clips should be played at
-    Tone.Transport.bpm.value = 100
+    Tone.Transport.bpm.value = 80
   } else {
-    Tone.Transport.bpm.value = 150
+    Tone.Transport.bpm.value = 110
   }
 
-  const pattern = ['[x_x]', '[xx]', '[xxx]', 'x']
+  const pattern = ['[xx_x]', '[x[xx]]', 'x', '[[xx]x]']
   // const pickedSpecial = _.sample(specialPatterns)
   // console.log(pickedSpecial)
 
@@ -40,7 +108,7 @@ function play4 (MYHASH) {
   const melodySaw = []
   let rhythmSaw = ''
 
-  let currentNote = 'C3'
+  let currentNote = basetone
   if (meta[9] === '0') {
     melodySine.push(currentNote)
     rhythmSaw += '-'
@@ -50,6 +118,7 @@ function play4 (MYHASH) {
     rhythmSaw += 'x'
     rhythmSine += '-'
   }
+  const playingNotes = []
 
   // TODO redundanten code aufräumen
   for (let i = 10; i < MYHASHbin.length; i += 6) {
@@ -60,9 +129,15 @@ function play4 (MYHASH) {
       rhythmSaw += '-'
       continue
     } else {
-      // FIXME vielleicht ist in die mitte springen schöner weil kein zurückspringen passieren kann
-      currentNote = scale[mod(scale.indexOf(currentNote) + step, scale.length)]
+      // DONE vielleicht ist in die mitte springen schöner weil kein zurückspringen passieren kann
+      if (scale.indexOf(currentNote) + step < 0 || scale.indexOf(currentNote) + step >= scale.length) {
+        const newstep = (scale.indexOf(currentNote) + step) % scale.length
+        currentNote = scale[scale.indexOf(basetone) + newstep]
+      } else {
+        currentNote = scale[scale.indexOf(currentNote) + step]
+      }
     }
+    playingNotes.push(currentNote)
     const rhythmIndex = parseInt(MYHASHbin[i + 4] + MYHASHbin[i + 5], 2)
     const xAmount = char_count(pattern[rhythmIndex], 'x')
 
@@ -86,6 +161,7 @@ function play4 (MYHASH) {
   console.log(melodySine)
   console.log(rhythmSaw)
   console.log(melodySaw)
+  console.log(playingNotes)
 
   const sine = new Tone.Synth()
   sine.oscillator.type = 'sine'
@@ -95,6 +171,8 @@ function play4 (MYHASH) {
     notes: melodySine,
     pattern: rhythmSine
   })
+
+  sine.volume.value = 10
 
   const saw = new Tone.Synth()
   saw.oscillator.type = 'sawtooth'
@@ -119,7 +197,7 @@ function play4 (MYHASH) {
   Tone.context.resume().then(() => Tone.Transport.start())
 }
 
-function play3 (MYHASH) {
+function play3(MYHASH) {
   const scale = getScale(4, blues2)
   console.log(scale)
 
@@ -170,7 +248,7 @@ function play3 (MYHASH) {
   Tone.context.resume().then(() => Tone.Transport.start())
 }
 
-function play2 (MYHASH) {
+function play2(MYHASH) {
   const MYHASHbin = hex2bin(MYHASH)
   const scale = getScale(4, fournote)
   console.log(scale)
@@ -246,7 +324,7 @@ function play2 (MYHASH) {
   Tone.context.resume().then(() => Tone.Transport.start())
 }
 
-function play () {
+function play() {
   // ---- test values ----
   const MYHASH = '45c9a6614fccd4f9592d8283a4f25bff84076fd43ee9f90eaa07746ebbed02ca'
   const MYHASH2 = 'a11a198cc31b4b7c2f37013847b9c3ab35c8d24d4db2159b29d41a9296fc1a82'
@@ -327,7 +405,7 @@ function play () {
 }
 
 // function to get a rhythm for a given value
-function getRhythm (x) {
+function getRhythm(x) {
   return 'x'
   // x = parseInt(x, 16)
   // x = Math.floor(x / 4)
@@ -361,9 +439,17 @@ const tonic = [0, 5, 7]
 const subdominant = [5, 0, 2]
 const dominant = [7, 2, 4]
 const fournote = [0, 3, 5, 7]
+const zigeunermoll = [0, 2, 3, 6, 7, 8, 11]
+const moll1 = [0, 2, 3, 5, 7]
+const moll2 = [0, 2, 3, 5, 7, 8]
+const ganzton = [0, 2, 4, 6, 8, 10]
+const harmonischmoll = [0, 2, 3, 5, 7, 8, 11]
+const melodischMoll = [0, 2, 3, 5, 7, 9, 10]
+const zigeunerdur = [0, 1, 4, 5, 7, 8, 11]
+const septakkord = [0, 4, 7, 10]
 
 // function to get the scales in the specified pitch
-function getScale (pitch, indices) {
+function getScale(pitch, indices) {
   const scale = []
   let index = 0
   for (const note of chromatic) {
@@ -375,7 +461,7 @@ function getScale (pitch, indices) {
   return scale
 }
 
-function tsd () {
+function tsd() {
   const scaleTonic = getScale(3, tonic)
   const scaleSubdominant = getScale(3, subdominant)
   const scaleDominant = getScale(3, dominant)
@@ -416,7 +502,7 @@ function tsd () {
   return [clip1, clip2]
 }
 
-function tsdHelp (scaleAny, amount) {
+function tsdHelp(scaleAny, amount) {
   const notes1 = []
   const notes2 = []
   for (let i = 0; i < amount; i++) {
@@ -430,7 +516,7 @@ function tsdHelp (scaleAny, amount) {
   return [notes1, notes2]
 }
 
-function hex2bin (hex) {
+function hex2bin(hex) {
   hex = hex.replace('0x', '').toLowerCase()
   var out = ''
   for (var c of hex) {
@@ -458,17 +544,16 @@ function hex2bin (hex) {
   return out
 }
 
-function stop () {
+function stop() {
   for (const x of playingClips) {
     x.stop()
   }
-  Tone.context.resume().then(() => Tone.Transport.stop())
+  //Tone.context.resume().then(() => Tone.Transport.stop())
 }
 
-function mod (v, m) {
+function mod(v, m) {
   console.log(v + " mod " + m)
   const temp = v % m
-  console.log(temp)
   if (temp < 0) {
     console.log("returning " + (m - temp))
     return (m + temp)
@@ -478,7 +563,7 @@ function mod (v, m) {
   }
 }
 
-function char_count (str, letter) {
+function char_count(str, letter) {
   var letter_Count = 0;
   for (var position = 0; position < str.length; position++) {
     if (str.charAt(position) == letter) {
