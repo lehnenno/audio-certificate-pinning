@@ -152,7 +152,7 @@ function play4 (MYHASH, volume) {
     playingClips.push(clip)
   }
   if (meta[7] === '1') {
-    const clip = getBeatClip(snare, '-' + '-x'.repeat(4), volume + 5)
+    const clip = getBeatClip(snare, '-' + '-x'.repeat(4), volume + 10) // snare needs some extra volume
     clip.start()
     playingClips.push(clip)
   }

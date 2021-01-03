@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-  <meta http-equiv="refresh" content="3" >
   <meta charset="UTF-8">
   <link href="style.css" rel="stylesheet" />
 </head>
@@ -11,13 +10,13 @@
   <h1>Audio Certificate Pinning</h1>
   <div class="container">
     <h2>Volume: </h2>
-    <input type="range" min="-50" max="50" value="0" class="slider" id="volumeSlider">
+    <input type="range" min="-30" max="30" value="0" class="slider" id="volumeSlider">
   </div>
   <div class="container">
     <h2>What Audio Fingerprint Version should be used?</h2>
-    <input type="radio" id="v1" name="playVersion" value=1 checked=true>
+    <input type="radio" id="v1" name="playVersion" value=1>
     <label for="key">Version 1</label>
-    <input type="radio" id="v2" name="playVersion" value=2>
+    <input type="radio" id="v2" name="playVersion" value=2 checked=true>
     <label for="cert">Version 2</label>
   </div>
   <div class="container buttonContainer">
@@ -28,7 +27,7 @@
     <button id="stopButton" class="stopButton inline">Stop</button>
   </div>
   <div class="container">
-    <textarea readonly id="output" class="textarea noborder"></textarea>
+    <textarea readonly id="output" class="textarea noborder">Output</textarea>
   </div>
   <script src="script.js"></script>
 </body>
