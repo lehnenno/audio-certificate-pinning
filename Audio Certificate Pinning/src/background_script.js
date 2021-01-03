@@ -49,13 +49,17 @@ browser.runtime.onMessage.addListener(
   }
 )
 
-function play (data) {
+function play(data) {
   // TODO test ob das promiseRevolve hier gebraucht wird
   return Promise.resolve(browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     // get the url of the currently visible tab
     const url = tabs[0].url
     if (url === undefined || map.get(url) === undefined) {
       return { message: 'Please reload the site or try another one to listen to the Fingerprint.' }
+    }
+
+    if (map.get(url).certificates === undefined) {
+      return { message: 'Seems like this site doesn\'t use SSL/TLS. There is nothing to play here.' }
     }
 
     // if any playback is running it needs to be stopped first

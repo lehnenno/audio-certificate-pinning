@@ -12,7 +12,7 @@
     "copy_icons": "cp -r ./src/icons ./build/icons",
     "copy_browserAction": "browserify ./src/browserAction/script.js -o ./build/browserAction/script.js && cp ./src/browserAction/index.html ./build/browserAction/index.html && cp ./src/browserAction/style.css ./build/browserAction/style.css",
     "copy_resources": "cp -r ./src/resources ./build/resources",
-    "clean": "rm -r ./build"
+    "clean": "rm -r ./build || true"
   },
   "author": "Noah Lehnen",
   "license": "ISC",
