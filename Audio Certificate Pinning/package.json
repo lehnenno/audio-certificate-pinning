@@ -6,18 +6,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "npm run clean && mkdir build",
-    "build": "npm run copy_manifest && npm run prepare_background && npm run copy_icons && npm run copy_browserAction && npm run copy_resources",
+    "build": "npm run copy_manifest && npm run prepare_background && npm run copy_icons && npm run copy_browserAction && npm run copy_resources && npm run copy_id",
     "copy_manifest": "cp ./src/manifest.json ./build/manifest.json",
     "prepare_background": "browserify ./src/background_script.js -o ./build/background_script.js",
     "copy_icons": "cp -r ./src/icons ./build/icons",
     "copy_browserAction": "browserify ./src/browserAction/script.js -o ./build/browserAction/script.js && cp ./src/browserAction/index.html ./build/browserAction/index.html && cp ./src/browserAction/style.css ./build/browserAction/style.css",
     "copy_resources": "cp -r ./src/resources ./build/resources",
+    "copy_id": "cp ./src/.web-extension-id ./build/.web-extension-id",
     "clean": "rm -r ./build || true"
   },
   "author": "Noah Lehnen",
   "license": "ISC",
   "devDependencies": {
-    "browserify": "^17.0.0"
+    "browserify": "^17.0.0",
+    "web-ext": "^5.4.1"
   },
   "dependencies": {
     "scribbletune": "^3.15.0",

@@ -6,18 +6,15 @@ var map = new Map()
 console.log('\n\nTLS browser extension loaded')
 
 // https://developer.chrome.com/extensions/match_patterns
-// TODO check if this is required
+// we want to save the certificates for all urls
 var ALL_SITES = { urls: ['<all_urls>'] }
 
-// Mozilla doesn't use tlsInfo in extraInfoSpec
-// TODO check if this is required
+// If you use "blocking", you must have the "webRequestBlocking" API permission in your manifest.json
+// required for webRequest.getSecurityInfo()
 var extraInfoSpec = ['blocking']
 
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webRequest/onHeadersReceived
 browser.webRequest.onHeadersReceived.addListener(async function (details) {
-  // log(`\n\nGot a request for ${details.url} with ID ${details.requestId}`)
-
-  // Yeah this is a String, even though the content is a Number
   var requestId = details.requestId
 
   var securityInfo = await browser.webRequest.getSecurityInfo(requestId, {
@@ -25,7 +22,7 @@ browser.webRequest.onHeadersReceived.addListener(async function (details) {
     rawDER: false
   })
 
-  // log('Details: ' + details)
+  securityInfo.timestamp = Date.now()
 
   map.set(details.url, securityInfo)
   //log(`securityInfo: ${JSON.stringify(securityInfo, null, 2)}`)
@@ -50,8 +47,7 @@ browser.runtime.onMessage.addListener(
 )
 
 function play(data) {
-  // TODO test ob das promiseRevolve hier gebraucht wird
-  return Promise.resolve(browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+  return browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     // get the url of the currently visible tab
     const url = tabs[0].url
     if (url === undefined || map.get(url) === undefined) {
@@ -68,7 +64,18 @@ function play(data) {
     const hash = map.get(url).certificates[0].fingerprint.sha256.replaceAll(':', '')
     player.playHash(hash, parseInt(data.playVersion), parseInt(data.volume), parseInt(data.part))
     return { message: 'Playing Certificate:\n' + JSON.stringify(map.get(url).certificates[0]) }
-  }))
+  })
 }
 
-// TODO setInterval for deleting old entrys in the map to save resources
+// delete old entrys from the map
+// check every minute
+setInterval(checkOldMapEntrys,60*1000)
+
+function checkOldMapEntrys() {
+  map.forEach( (value, key, map) => {
+    // if the entry is older than 5mins delete it
+    if(Date.now()-value.timestamp > 300*1000) {
+      map.delete(key)
+    }
+  })
+}
