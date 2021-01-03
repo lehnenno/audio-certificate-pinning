@@ -5,7 +5,14 @@
   "version": "0.1",
   "content_security_policy": "script-src 'self' blob:; object-src 'self'",
   "permissions": [
-    "storage","webRequest","webRequestBlocking","<all_urls>"
+    "storage","webRequest","webRequestBlocking","<all_urls>","tabs"
+  ],
+  "web_accessible_resources": [
+    "resources/kick.wav",
+    "resources/ch.wav",
+    "resources/oh.wav",
+    "resources/snare.wav",
+    "resources/bass.wav"
   ],
   "icons": {
     "64": "icons/icon.png"

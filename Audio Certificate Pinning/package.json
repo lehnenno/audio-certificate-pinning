@@ -6,11 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "npm run clean && mkdir build",
-    "build": "npm run copy_manifest && npm run prepare_background && npm run copy_icons && npm run copy_browserAction",
+    "build": "npm run copy_manifest && npm run prepare_background && npm run copy_icons && npm run copy_browserAction && npm run copy_resources",
     "copy_manifest": "cp ./src/manifest.json ./build/manifest.json",
-    "prepare_background": "browserify ./src/background_script.js -o ./build/background_script.js && cp ./src/background.html ./build/background.html",
+    "prepare_background": "browserify ./src/background_script.js -o ./build/background_script.js",
     "copy_icons": "cp -r ./src/icons ./build/icons",
     "copy_browserAction": "browserify ./src/browserAction/script.js -o ./build/browserAction/script.js && cp ./src/browserAction/index.html ./build/browserAction/index.html && cp ./src/browserAction/style.css ./build/browserAction/style.css",
+    "copy_resources": "cp -r ./src/resources ./build/resources",
     "clean": "rm -r ./build"
   },
   "author": "Noah Lehnen",

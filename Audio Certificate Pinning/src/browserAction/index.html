@@ -2,34 +2,35 @@
 <html lang="en">
 
 <head>
+  <meta http-equiv="refresh" content="3" >
   <meta charset="UTF-8">
   <link href="style.css" rel="stylesheet" />
 </head>
 
 <body>
   <h1>Audio Certificate Pinning</h1>
-  <script src="script.js"></script>
   <div class="container">
     <h2>Volume: </h2>
-    <input type="range" min="0" max="100" value="50" class="slider" id="volume">
+    <input type="range" min="-50" max="50" value="0" class="slider" id="volumeSlider">
   </div>
-  <div id="tobepinned" class="container">
-    <form>
-      <h2>What would you like to pin?</h2>
-      <input type="radio" id="key" name="Pinned" value="PublicKey">
-      <label for="key"> Public Key</label>
-      <input type="radio" id="cert" name="Pinned" value="Certificate">
-      <label for="cert"> Certificate</label>
-      <input type="radio" id="custom" name="Pinned" value="Custom">
-      <label for="custom"> Custom Value</label>
-    </form>
-    <textarea class="textarea"></textarea>
-  </div>
-  <button class="inline">Stop</button>
-  <button class="inline">Play</button>
   <div class="container">
-    <textarea readonly class="textarea noborder"></textarea>
+    <h2>What Audio Fingerprint Version should be used?</h2>
+    <input type="radio" id="v1" name="playVersion" value=1 checked=true>
+    <label for="key">Version 1</label>
+    <input type="radio" id="v2" name="playVersion" value=2>
+    <label for="cert">Version 2</label>
   </div>
+  <div class="container buttonContainer">
+    <button name="playButton" value="1" class="inline">Play 1</button>
+    <button name="playButton" value="2" class="inline">Play 2</button>
+    <button name="playButton" value="3" class="inline">Play 3</button>
+    <button name="playButton" value="4" class="inline">Play 4</button>
+    <button id="stopButton" class="stopButton inline">Stop</button>
+  </div>
+  <div class="container">
+    <textarea readonly id="output" class="textarea noborder"></textarea>
+  </div>
+  <script src="script.js"></script>
 </body>
 
 </html>
