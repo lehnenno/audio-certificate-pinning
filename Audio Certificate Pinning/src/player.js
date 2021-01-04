@@ -124,7 +124,7 @@ function pickBeat (hexValue) {
 function play4 (MYHASH, volume) {
   const MYHASHbin = hex2bin(MYHASH)
   const meta = MYHASHbin.slice(0, 10)
-  const scalesTypes = [major, ganzton, phrygian, zigeunermoll, blues2, minor, septakkord, pentatonic]
+  const scalesTypes = [major, ganzton, phrygian, ungarisch, blues2, minor, septakkord, pentatonic]
   const scaleType = scalesTypes[parseInt(meta.slice(0, 3), 2)]
   const scale = getScale(3, scaleType).concat(getScale(4, scaleType))//.concat(getScale(5, scaleType))
   const basetone = 'C4'
@@ -158,7 +158,7 @@ function play4 (MYHASH, volume) {
   }
 
   if (meta[8] === '0') {
-    // sets the bpm clips should be played at
+    // sets the bpm the clips should be played at
     Tone.Transport.bpm.value = 80
   } else {
     Tone.Transport.bpm.value = 110
@@ -262,27 +262,27 @@ function play4 (MYHASH, volume) {
 //                 0    1     2     3     4    5     6    7    8     9    10    11
 const chromatic = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 const major = [0, 2, 4, 5, 7, 9, 11]
-const dorian = [0, 2, 3, 5, 7, 9, 10]
+// const dorian = [0, 2, 3, 5, 7, 9, 10]
 const phrygian = [0, 1, 3, 5, 7, 8, 10]
-const lydian = [0, 2, 4, 6, 7, 9, 11]
-const mixlydian = [0, 2, 4, 5, 7, 9, 10]
+// const lydian = [0, 2, 4, 6, 7, 9, 11]
+// const mixlydian = [0, 2, 4, 5, 7, 9, 10]
 const minor = [0, 2, 3, 5, 7, 8, 10]
-const locrian = [0, 1, 3, 5, 6, 8, 10]
+// const locrian = [0, 1, 3, 5, 6, 8, 10]
 const all = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const pentatonic = [0, 2, 4, 7, 9]
-const blues1 = [0, 3, 5, 7, 10]
+// const blues1 = [0, 3, 5, 7, 10]
 const blues2 = [0, 3, 5, 6, 7, 10]
-const tonic = [0, 5, 7]
-const subdominant = [5, 0, 2]
-const dominant = [7, 2, 4]
-const fournote = [0, 3, 5, 7]
-const zigeunermoll = [0, 2, 3, 6, 7, 8, 11]
-const moll1 = [0, 2, 3, 5, 7]
-const moll2 = [0, 2, 3, 5, 7, 8]
+// const tonic = [0, 5, 7]
+// const subdominant = [5, 0, 2]
+// const dominant = [7, 2, 4]
+// const fournote = [0, 3, 5, 7]
+const ungarisch = [0, 2, 3, 6, 7, 8, 11]
+// const moll1 = [0, 2, 3, 5, 7]
+// const moll2 = [0, 2, 3, 5, 7, 8]
 const ganzton = [0, 2, 4, 6, 8, 10]
-const harmonischmoll = [0, 2, 3, 5, 7, 8, 11]
-const melodischMoll = [0, 2, 3, 5, 7, 9, 10]
-const zigeunerdur = [0, 1, 4, 5, 7, 8, 11]
+// const harmonischmoll = [0, 2, 3, 5, 7, 8, 11]
+// const melodischMoll = [0, 2, 3, 5, 7, 9, 10]
+// const arabisch = [0, 1, 4, 5, 7, 8, 11]
 const septakkord = [0, 4, 7, 10]
 
 // function to get the scales in the specified pitch
