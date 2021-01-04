@@ -1,4 +1,4 @@
-#### Das Plugin ist nur mit firefox kompatibel.
+#### Die Extension ist nur mit firefox kompatibel.
 
 
 # Installation
