@@ -24,6 +24,10 @@ button:active {
   transform: translateY(4px);
 }
 
+h1 {
+  text-align: center;
+}
+
 .stopButton {
   background-color: rgb(149, 3, 3);
 }
