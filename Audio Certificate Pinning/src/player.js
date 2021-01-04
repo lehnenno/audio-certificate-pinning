@@ -1,9 +1,14 @@
 // ---- imports for librarys ----
 // tone is for audio playback in the browser
 // scribbletune creates midi data
-console.log('player.js loading')
+console.log('player.js loading') // just to check the import works
 window.Tone = require('tone')
 const scribble = require('scribbletune')
+
+module.exports = {
+  playHash: playHash,
+  stop: stop
+}
 
 // some constants
 const sineVolume = -5
@@ -18,16 +23,12 @@ const ch = new Tone.Player(browser.extension.getURL('resources/ch.wav')).toDesti
 const oh = new Tone.Player(browser.extension.getURL('resources/oh.wav')).toDestination();
 const snare = new Tone.Player(browser.extension.getURL('resources/snare.wav')).toDestination();
 
-module.exports = {
-  playHash: playHash,
-  stop: stop
-}
-
+// stores the currently playing clips so they can be stopped if requested
 const playingClips = []
 
 // hash should be a 256bit hash as hex. part decides which 64bits are gonna be processed
 function playHash (hash, playVersion, volume, part) {
-  console.log('play called with ' + hash + ' ' + playVersion + ' ' + volume)
+  // console.log('play called with ' + hash + ' ' + playVersion + ' ' + volume)
   const partialHash = getPartialHash(hash, part)
   switch (playVersion) {
     case 1:
@@ -53,7 +54,7 @@ function getPartialHash (hash, part) {
 }
 
 function stop () {
-  console.log('stop called!')
+  //console.log('stop called!')
   for (const x of playingClips) {
     x.stop()
   }
@@ -63,7 +64,7 @@ function stop () {
 // MYHASH is 64bit as hex 
 function play5 (MYHASH, volume) {
   const scale = getScale(4, pentatonic).concat(getScale(5, pentatonic)).slice(0, 8)
-  console.log(scale)
+  // console.log(scale)
   const basenote = 'F4'
 
   const melody = [basenote]
@@ -75,8 +76,8 @@ function play5 (MYHASH, volume) {
     rhythm += 'x'
     beat += pickBeat(hexValue)
   }
-  console.log(beat)
-  console.log(melody)
+  // console.log(beat)
+  // console.log(melody)
 
 
   const sine = getSynth('sine', sineVolume + volume)
@@ -124,6 +125,7 @@ function pickBeat (hexValue) {
 function play4 (MYHASH, volume) {
   const MYHASHbin = hex2bin(MYHASH)
   const meta = MYHASHbin.slice(0, 10)
+
   const scalesTypes = [major, ganzton, phrygian, ungarisch, blues2, minor, septakkord, pentatonic]
   const scaleType = scalesTypes[parseInt(meta.slice(0, 3), 2)]
   const scale = getScale(3, scaleType).concat(getScale(4, scaleType))//.concat(getScale(5, scaleType))
@@ -157,16 +159,15 @@ function play4 (MYHASH, volume) {
     playingClips.push(clip)
   }
 
+  // sets the bpm the clips should be played at
   if (meta[8] === '0') {
-    // sets the bpm the clips should be played at
     Tone.Transport.bpm.value = 80
   } else {
     Tone.Transport.bpm.value = 110
   }
 
+  // The used rhytm Patterns
   const pattern = ['[xx_x]', '[x[xx]]', 'x', '[[xx]x]']
-  // const pickedSpecial = _.sample(specialPatterns)
-  // console.log(pickedSpecial)
 
   const melodySine = []
   let rhythmSine = ''
@@ -174,6 +175,7 @@ function play4 (MYHASH, volume) {
   let rhythmSaw = ''
 
   let currentNote = basetone
+  // decide which synth should play the first note
   if (meta[9] === '0') {
     melodySine.push(currentNote)
     rhythmSaw += '-'
@@ -183,17 +185,20 @@ function play4 (MYHASH, volume) {
     rhythmSaw += 'x'
     rhythmSine += '-'
   }
-  const playingNotes = []
 
-  // TODO redundanten code aufräumen
+  // iterate over 6bits at a time
   for (let i = 10; i < MYHASHbin.length; i += 6) {
+    // get the steps that we should go on the scale -3 to 3
     let step = parseInt(MYHASHbin[i + 1] + MYHASHbin[i + 2] + MYHASHbin[i + 3], 2)
     step = step - 4
     if (step === -4) {
+      // if step is -4 play a break
       rhythmSine += '-'
       rhythmSaw += '-'
       continue
     } else {
+      // if scale runs out of notes on the bottom or top - jump back to the basenote (and go the remaining steps)
+      // else go the steps on the scale
       if (scale.indexOf(currentNote) + step < 0 || scale.indexOf(currentNote) + step >= scale.length) {
         const newstep = (scale.indexOf(currentNote) + step) % scale.length
         currentNote = scale[scale.indexOf(basetone) + newstep]
@@ -201,10 +206,13 @@ function play4 (MYHASH, volume) {
         currentNote = scale[scale.indexOf(currentNote) + step]
       }
     }
-    playingNotes.push(currentNote)
+
+    // get the index that is used to determin the rhythm pattern for the current note
     const rhythmIndex = parseInt(MYHASHbin[i + 4] + MYHASHbin[i + 5], 2)
     const xAmount = charCount(pattern[rhythmIndex], 'x')
 
+    // if-else decides what synth/instrument should play the current note
+    // for loop adds the amount of notes required for the corresponding rhythm pattern
     if (MYHASHbin[i] === '0') {
       for (let i = 0; i < xAmount; i++) {
         melodySine.push(currentNote)
@@ -220,12 +228,11 @@ function play4 (MYHASH, volume) {
     }
   }
 
-  console.log(parseInt(meta.slice(0, 3), 2))
-  console.log(rhythmSine)
-  console.log(melodySine)
-  console.log(rhythmSaw)
-  console.log(melodySaw)
-  console.log(playingNotes)
+  // console.log(parseInt(meta.slice(0, 3), 2))
+  // console.log(rhythmSine)
+  // console.log(melodySine)
+  // console.log(rhythmSaw)
+  // console.log(melodySaw)
 
   const sine = getSynth('sine', sineVolume + volume)
 
@@ -236,7 +243,6 @@ function play4 (MYHASH, volume) {
   })
 
   const saw = getSynth('sawtooth', sawtoothVolume + volume)
-  console.log(saw)
 
   const clipSaw = scribble.clip({
     synth: saw,
@@ -251,13 +257,13 @@ function play4 (MYHASH, volume) {
   clipSine.start()
   clipSaw.start()
 
+  // add the clips to the list so they can be stopped
   playingClips.push(clipSaw, clipSine)
 
   // this line is required for the playback to work in browser
   Tone.context.resume().then(() => Tone.Transport.start())
 }
 
-// TODO aufräumen
 // ---- scales used to pick notes ----
 //                 0    1     2     3     4    5     6    7    8     9    10    11
 const chromatic = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -346,6 +352,7 @@ function getSynth (type, volume) {
   return synth
 }
 
+// returns a clip using the given parameters
 function getBeatClip (player, pattern, volume) {
   player.volume.value = volume + beatVolume2
 

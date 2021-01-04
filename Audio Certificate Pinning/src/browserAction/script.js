@@ -5,8 +5,10 @@ const volumeSlider = document.getElementById('volumeSlider')
 const playVersionRadio = document.getElementsByName('playVersion')
 const storage = browser.storage.local
 
+// set the volume slider to the position it had the last time
 initVolume()
 
+// Event Listeners for Buttons and Slider
 stopButton.addEventListener("click", stop)
 for(const playButton of playButtons) {
   playButton.addEventListener("click", play)
@@ -23,6 +25,7 @@ async function stop () {
   output.innerText = response.message
 }
 
+// function to start playback called by a button
 async function play (event) {
   // sends a message to the background script
   const response = await browser.runtime.sendMessage({
@@ -35,11 +38,13 @@ async function play (event) {
   output.innerText = response.message
 }
 
+// called onChange by the volume slider
 async function volume (event) {
   // set the volume value to local storage for the play function to use and to make the information persitent
   storage.set({ volume: event.target.value })
 }
 
+// called every time the script is loaded to set the last selected volume
 async function initVolume () {
   let volume = await storage.get('volume').then(result => result.volume)
   if (volume) {
@@ -50,6 +55,7 @@ async function initVolume () {
   }
 }
 
+// gets the selected Version from the radio buttons
 function getPlayVersion () {
   for (i = 0; i < playVersionRadio.length; i++) {
     if (playVersionRadio[i].checked) {
