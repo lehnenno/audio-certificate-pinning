@@ -1,3 +1,6 @@
+#### Das Plugin ist nur mit firefox kompatibel.
+
+
 # Installation
 Die .xpi Datei kann mit Firefox ausgeführt werden. In Firefox sollte dann ein kleines Fenster geöffnet werden. Hier müssen der Extension die gewünschten Zugriffsrechte erteilt werden. Danach sollte die Extension installiert sein. Ein kleiner grüner Punkt sollte in der oberen rechten Ecke des Browsers zu sehen sein über den die Extension bedient wird.
 
