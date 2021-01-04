@@ -3,7 +3,7 @@ const player = require('./player.js')
 // map to hold current certificate info for each url
 var map = new Map()
 
-console.log('\n\nTLS browser extension loaded')
+console.log('\n\nTLS browser extension loaded') // just an output to check things are working
 
 // https://developer.chrome.com/extensions/match_patterns
 // we want to save the certificates for all urls
@@ -31,11 +31,9 @@ browser.webRequest.onHeadersReceived.addListener(async function (details) {
 browser.runtime.onMessage.addListener(
   // cant be async https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
   (data, sender) => {
-    console.log('got a message')
     if (data.command === 'play') {
       player.stop()
       const rv = play(data)
-      console.log('rv: ' + rv)
       return Promise.resolve(rv)
     } else if (data.command === 'stop') {
       player.stop()
